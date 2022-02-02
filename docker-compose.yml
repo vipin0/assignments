@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  web:
+    image: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./data/web:/usr/share/nginx/html
+    networks:
+      - frontend
+    depends_on:
+      - db
+    secrets:
+      - MYSQL_ROOT_PASSWORD

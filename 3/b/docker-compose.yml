@@ -1,0 +1,59 @@
+version: '3.8'
+services:
+    server:
+        # container_name: php-apache
+        image: php-app
+        environment:
+          DB_SERVER: db
+          DB_NAME: testDB
+          DB_USER: vipin
+          DB_PASSWORD_FILE: /run/secrets/mysql_password
+        depends_on:
+            - db
+        volumes:
+            - ./php-code/:/var/www/html/
+        ports:
+            - 8080:80
+        networks:
+            - db_network
+        secrets:
+            - mysql_user
+            - mysql_password
+    db:
+        # container_name: db
+        image: mysql:8
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_password
+            MYSQL_USER_FILE: /run/secrets/mysql_user
+            MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
+            MYSQL_DATABASE: testDB
+        ports:
+            - "9906:3306"
+        networks:
+            - db_network
+        secrets:
+            - mysql_user
+            - mysql_password
+            - mysql_root_password
+        volumes:
+            - db_data_b:/var/lib/mysql
+networks:
+    db_network:
+        name: php-db-network
+secrets:
+    mysql_user:
+        external: true
+        name: mysql_user
+        # file: db_user.txt
+    mysql_password:
+        external: true
+        name: mysql_password
+        # file: db_pass.txt
+    mysql_root_password:
+        external: true
+        # file: db_root_pass.txt
+        name: mysql_root_password
+volumes:
+    db_data_b:
+        name: db_data_b
